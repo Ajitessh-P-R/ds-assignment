@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hostel Assist - Distributed Web Application</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            padding: 30px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            color: #ffd700;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .header p {
+            color: #e0e0e0;
+            font-size: 1.1em;
+        }
+
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .module-card {
+            background: rgba(255, 255, 255, 0.95);
+            color: #1a237e;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .module-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
+        }
+
+        .module-card h2 {
+            color: #1a237e;
+            border-bottom: 3px solid #ffd700;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .module-card h3 {
+            color: #283593;
+            margin: 15px 0 10px 0;
+            font-size: 1.1em;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #1a237e;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #283593;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #ffd700;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+            color: #ffffff;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #283593 0%, #3949ab 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #ffd700 0%, #ffc107 100%);
+            color: #1a237e;
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #ffc107 0%, #ffb300 100%);
+        }
+
+        .result-area {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            border-left: 4px solid #ffd700;
+            min-height: 50px;
+            color: #1a237e;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-weight: 600;
+        }
+
+        .status.success {
+            background: #4caf50;
+            color: white;
+        }
+
+        .status.error {
+            background: #f44336;
+            color: white;
+        }
+
+        .status.info {
+            background: #2196f3;
+            color: white;
+        }
+
+        .counter-display {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .counter-box {
+            flex: 1;
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .counter-box h4 {
+            margin-bottom: 10px;
+            color: #ffd700;
+        }
+
+        .counter-value {
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+
+        .notice-item {
+            background: #f5f5f5;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #283593;
+        }
+
+        .notice-item h4 {
+            color: #1a237e;
+            margin-bottom: 5px;
+        }
+
+        .notice-item p {
+            color: #424242;
+            margin: 5px 0;
+        }
+
+        .notice-item .date {
+            color: #757575;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏠 Hostel Assist</h1>
+            <p>Distributed Web Application - 23CSE312 Lab Project</p>
+            <p style="font-size: 0.9em; margin-top: 5px;">Amrita Vishwa Vidyapeetham - Chennai Campus</p>
+        </div>
+
+        <div class="modules-grid">
+            <!-- MODULE 1: Socket Programming - Complaint System -->
+            <div class="module-card">
+                <h2>Module 1: Hostel Complaint System</h2>
+                <p style="color: #757575; margin-bottom: 15px;"><strong>Communication Model:</strong> Socket Programming (TCP)</p>
+                
+                <div class="form-group">
+                    <label>Room Number:</label>
+                    <input type="text" id="complaintRoom" placeholder="e.g., A-101">
+                </div>
+                
+                <div class="form-group">
+                    <label>Category:</label>
+                    <select id="complaintCategory">
+                        <option value="Water">Water</option>
+                        <option value="Electricity">Electricity</option>
+                        <option value="Cleanliness">Cleanliness</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Description:</label>
+                    <textarea id="complaintDesc" placeholder="Describe your complaint..."></textarea>
+                </div>
+                
+                <button class="btn" onclick="submitComplaint()">Submit Complaint</button>
+                <button class="btn btn-secondary" onclick="viewComplaints()" style="margin-left: 10px;">View All Complaints</button>
+                
+                <div id="complaintResult" class="result-area" style="display: none;"></div>
+            </div>
+
+            <!-- MODULE 2: RMI - Room Information -->
+            <div class="module-card">
+                <h2>Module 2: Room Information Service</h2>
+                <p style="color: #757575; margin-bottom: 15px;"><strong>Communication Model:</strong> Java RMI</p>
+                
+                <div class="form-group">
+                    <label>Room Number:</label>
+                    <input type="text" id="roomNumber" placeholder="e.g., A-101">
+                </div>
+                
+                <button class="btn" onclick="getRoomDetails()">Get Room Details</button>
+                <button class="btn btn-secondary" onclick="getWardenContact()" style="margin-left: 10px;">Get Warden Contact</button>
+                
+                <div id="roomResult" class="result-area" style="display: none;"></div>
+            </div>
+
+            <!-- MODULE 3: REST/RPC - Notice Board -->
+            <div class="module-card">
+                <h2>Module 3: Hostel Notice Board</h2>
+                <p style="color: #757575; margin-bottom: 15px;"><strong>Communication Model:</strong> REST API (RPC)</p>
+                
+                <h3>Admin: Add Notice</h3>
+                <div class="form-group">
+                    <label>Title:</label>
+                    <input type="text" id="noticeTitle" placeholder="Notice title">
+                </div>
+                
+                <div class="form-group">
+                    <label>Message:</label>
+                    <textarea id="noticeMessage" placeholder="Notice content..."></textarea>
+                </div>
+                
+                <button class="btn" onclick="addNotice()">Add Notice</button>
+                
+                <h3>Student: View Notices</h3>
+                <button class="btn btn-secondary" onclick="fetchNotices()">Fetch All Notices</button>
+                
+                <div id="noticeResult" class="result-area" style="display: none;"></div>
+            </div>
+
+            <!-- MODULE 4: P2P - Resource Sharing -->
+            <div class="module-card">
+                <h2>Module 4: Student Resource Sharing</h2>
+                <p style="color: #757575; margin-bottom: 15px;"><strong>Communication Model:</strong> Peer-to-Peer (P2P)</p>
+                
+                <div class="form-group">
+                    <label>Resource Name:</label>
+                    <input type="text" id="resourceName" placeholder="e.g., Study Material">
+                </div>
+                
+                <div class="form-group">
+                    <label>Resource Type:</label>
+                    <select id="resourceType">
+                        <option value="Notes">Notes</option>
+                        <option value="Books">Books</option>
+                        <option value="Software">Software</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                
+                <button class="btn" onclick="shareResource()">Share Resource</button>
+                <button class="btn btn-secondary" onclick="discoverResources()" style="margin-left: 10px;">Discover Resources</button>
+                
+                <div id="resourceResult" class="result-area" style="display: none;"></div>
+            </div>
+
+            <!-- MODULE 5: Shared Memory - Mess Feedback -->
+            <div class="module-card">
+                <h2>Module 5: Mess Feedback Live Counter</h2>
+                <p style="color: #757575; margin-bottom: 15px;"><strong>Communication Model:</strong> Shared Memory</p>
+                
+                <div class="counter-display">
+                    <div class="counter-box">
+                        <h4>Good</h4>
+                        <div class="counter-value" id="goodCount">0</div>
+                    </div>
+                    <div class="counter-box">
+                        <h4>Average</h4>
+                        <div class="counter-value" id="avgCount">0</div>
+                    </div>
+                    <div class="counter-box">
+                        <h4>Poor</h4>
+                        <div class="counter-value" id="poorCount">0</div>
+                    </div>
+                </div>
+                
+                <h3>Submit Feedback</h3>
+                <button class="btn" onclick="submitFeedback('good')" style="background: #4caf50;">Good</button>
+                <button class="btn" onclick="submitFeedback('average')" style="background: #ff9800; margin-left: 10px;">Average</button>
+                <button class="btn" onclick="submitFeedback('poor')" style="background: #f44336; margin-left: 10px;">Poor</button>
+                <button class="btn btn-secondary" onclick="refreshCounters()" style="margin-left: 10px;">Refresh Counters</button>
+                
+                <div id="feedbackResult" class="result-area" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Module 1: Socket Programming - Complaint System
+        async function submitComplaint() {
+            const room = document.getElementById('complaintRoom').value;
+            const category = document.getElementById('complaintCategory').value;
+            const desc = document.getElementById('complaintDesc').value;
+            
+            if (!room || !desc) {
+                alert('Please fill all fields');
+                return;
+            }
+            
+            const resultDiv = document.getElementById('complaintResult');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Connecting to server...';
+            
+            try {
+                // Using HTTP proxy to communicate with Socket server
+                const response = await fetch('http://localhost:8081/submit', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({room, category, description: desc})
+                });
+                
+                const data = await response.json();
+                resultDiv.textContent = data.message || 'Complaint submitted successfully!';
+                resultDiv.className = 'result-area status success';
+            } catch (error) {
+                resultDiv.textContent = 'Error: ' + error.message + '\nMake sure Module1_Socket.java is running on port 8081';
+                resultDiv.className = 'result-area status error';
+            }
+        }
+        
+        async function viewComplaints() {
+            const resultDiv = document.getElementById('complaintResult');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Fetching complaints...';
+            
+            try {
+                const response = await fetch('http://localhost:8081/view');
+                const data = await response.json();
+                resultDiv.textContent = JSON.stringify(data, null, 2);
+                resultDiv.className = 'result-area';
+            } catch (error) {
+                resultDiv.textContent = 'Error: ' + error.message;
+                resultDiv.className = 'result-area status error';
+            }
+        }
+
+        // Module 2: RMI - Room Information
+        async function getRoomDetails() {
+            const roomNumber = document.getElementById('roomNumber').value;
+            if (!roomNumber) {
+                alert('Please enter room number');
+                return;
+            }
+            
+            const resultDiv = document.getElementById('roomResult');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Invoking RMI method...';
+            
+            try {
+                const response = await fetch('http://localhost:8082/room/' + encodeURIComponent(roomNumber));
+                const data = await response.json();
+                resultDiv.textContent = JSON.stringify(data, null, 2);
+                resultDiv.className = 'result-area';
+            } catch (error) {
+                resultDiv.textContent = 'Error: ' + error.message + '\nMake sure Module2_RMI.java is running on port 8082';
+                resultDiv.className = 'result-area status error';
+            }
+        }
+        
+        async function getWardenContact() {
+            const resultDiv = document.getElementById('roomResult');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Fetching warden contact...';
+            
+            try {
+                const response = await fetch('http://localhost:8082/warden');
+                const data = await response.json();
+                resultDiv.textContent = JSON.stringify(data, null, 2);
+                resultDiv.className = 'result-area';
+            } catch (error) {
+                resultDiv.textContent = 'Error: ' + error.message;
+                resultDiv.className = 'result-area status error';
+            }
+        }
+
+        // Module 3: REST/RPC - Notice Board
+        async function addNotice() {
+            const title = document.getElementById('noticeTitle').value;
+            const message = document.getElementById('noticeMessage').value;
+            
+            if (!title || !message) {
+                alert('Please fill all fields');
+                return;
+            }
+            
+            const resultDiv = document.getElementById('noticeResult');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Adding notice...';
+            
+            try {
+                const response = await fetch('http://localhost:8083/notices', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({title, message})
+                });
+                
+                const data = await response.json();
+                resultDiv.textContent = data.message || 'Notice added successfully!';
+                resultDiv.className = 'result-area status success';
+            } catch (error) {
+                resultDiv.textContent = 'Error: ' + error.message + '\nMake sure Module3_REST.java is running on port 8083';
+                resultDiv.className = 'result-area status error';
+            }
+        }
+        
+        async function fetchNotices() {
+            const resultDiv = document.getElementById('noticeResult');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Fetching notices...';
+            
+            try {
+                const response = await fetch('http://localhost:8083/notices');
+                const data = await response.json();
+                
+                if (data.notices && data.notices.length > 0) {
+                    let html = '';
+                    data.notices.forEach(notice => {
+                        html += `<div class="notice-item">
+                            <h4>${notice.title}</h4>
+                            <p>${notice.message}</p>
+                            <p class="date">Date: ${notice.date}</p>
+                        </div>`;
+                    });
+                    resultDiv.innerHTML = html;
+                } else {
+                    resultDiv.textContent = 'No notices available.';
+                }
+                resultDiv.className = 'result-area';
+            } catch (error) {
+                resultDiv.textContent = 'Error: ' + error.message;
+                resultDiv.className = 'result-area status error';
+            }
+        }
+
+        // Module 4: P2P - Resource Sharing
+        async function shareResource() {
+            const name = document.getElementById('resourceName').value;
+            const type = document.getElementById('resourceType').value;
+            
+            if (!name) {
+                alert('Please enter resource name');
+                return;
+            }
+            
+            const resultDiv = document.getElementById('resourceResult');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Sharing resource...';
+            
+            try {
+                const response = await fetch('http://localhost:8084/share', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({name, type})
+                });
+                
+                const data = await response.json();
+                resultDiv.textContent = data.message || 'Resource shared successfully!';
+                resultDiv.className = 'result-area status success';
+            } catch (error) {
+                resultDiv.textContent = 'Error: ' + error.message + '\nMake sure Module4_P2P.java is running on port 8084';
+                resultDiv.className = 'result-area status error';
+            }
+        }
+        
+        async function discoverResources() {
+            const resultDiv = document.getElementById('resourceResult');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Discovering resources from peers...';
+            
+            try {
+                const response = await fetch('http://localhost:8084/discover');
+                const data = await response.json();
+                resultDiv.textContent = JSON.stringify(data, null, 2);
+                resultDiv.className = 'result-area';
+            } catch (error) {
+                resultDiv.textContent = 'Error: ' + error.message;
+                resultDiv.className = 'result-area status error';
+            }
+        }
+
+        // Module 5: Shared Memory - Mess Feedback
+        async function submitFeedback(rating) {
+            const resultDiv = document.getElementById('feedbackResult');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Submitting feedback...';
+            
+            try {
+                const response = await fetch('http://localhost:8085/feedback', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({rating})
+                });
+                
+                const data = await response.json();
+                resultDiv.textContent = data.message || 'Feedback submitted!';
+                resultDiv.className = 'result-area status success';
+                
+                // Update counters
+                refreshCounters();
+            } catch (error) {
+                resultDiv.textContent = 'Error: ' + error.message + '\nMake sure Module5_Shared.java is running on port 8085';
+                resultDiv.className = 'result-area status error';
+            }
+        }
+        
+        async function refreshCounters() {
+            try {
+                const response = await fetch('http://localhost:8085/counters');
+                const data = await response.json();
+                
+                document.getElementById('goodCount').textContent = data.good || 0;
+                document.getElementById('avgCount').textContent = data.average || 0;
+                document.getElementById('poorCount').textContent = data.poor || 0;
+            } catch (error) {
+                console.error('Error refreshing counters:', error);
+            }
+        }
+        
+        // Auto-refresh counters every 2 seconds
+        setInterval(refreshCounters, 2000);
+    </script>
+</body>
+</html>
+
